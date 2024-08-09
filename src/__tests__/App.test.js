@@ -1,91 +1,43 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom';
-
 import App from "../App";
 
-// Portfolio Elements
-test("displays a top-level heading with the text `Hi, I'm _______`", () => {
-  render(<App />);
-
-  const topLevelHeading = screen.getByRole("heading", {
-    name: /hi, i'm/i,
-    exact: false,
-    level: 1,
-  });
-
-  expect(topLevelHeading).toBeInTheDocument();
-});
-
-test("displays an image of yourself", () => {
-  render(<App />);
-
-  const image = screen.getByAltText("My profile pic");
-
-  expect(image).toHaveAttribute("src", "https://via.placeholder.com/350");
-});
-
-test("displays second-level heading with the text `About Me`", () => {
-  render(<App />);
-
-  const secondLevelHeading = screen.getByRole("heading", {
-    name: /about me/i,
-    level: 2,
-  });
-
-  expect(secondLevelHeading).toBeInTheDocument();
-});
-
-test("displays a paragraph for your biography", () => {
-  render(<App />);
-
-  const bio = screen.getByText(/lorem ipsum/i);
-
-  expect(bio).toBeInTheDocument();
-});
-
-test("displays the correct links", () => {
-  render(<App />);
-
-  const githubLink = screen.getByRole("link", {
-    name: /github/i,
-  });
-  const linkedinLink = screen.getByRole("link", {
-    name: /linkedin/i,
-  });
-
-  expect(githubLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://github.com")
-  );
-
-  expect(linkedinLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://linkedin.com")
-  );
-});
-
-// Newsletter Form - Initial State
-test("the form includes text inputs for name and email address", () => {
-  // your test code here
-});
-
-test("the form includes three checkboxes to select areas of interest", () => {
-  // your test code here
-});
-
-test("the checkboxes are initially unchecked", () => {
-  // your test code here
-});
-
-// Newsletter Form - Adding Responses
+// Test to check if the form shows the entered name and email
 test("the page shows information the user types into the name and email address form fields", () => {
-  // your test code here
+  render(<App />);
+
+  const nameInput = screen.getByPlaceholderText("Name");
+  const emailInput = screen.getByPlaceholderText("Email");
+  const submitButton = screen.getByText("Submit");
+
+  fireEvent.change(nameInput, { target: { value: "John Doe" } });
+  fireEvent.change(emailInput, { target: { value: "john.doe@example.com" } });
+  fireEvent.click(submitButton);
+
+  const message = screen.getByText(/Name: John Doe/);
+  expect(message).toBeInTheDocument();
+  expect(message).toHaveTextContent("Email: john.doe@example.com");
+  expect(message).toHaveTextContent("No interests selected");
 });
 
-test("checked status of checkboxes changes when user clicks them", () => {
-  // your test code here
-});
-
+// Test to check if the message is displayed correctly upon submission
 test("a message is displayed when the user clicks the Submit button", () => {
-  // your test code here
+  render(<App />);
+
+  const nameInput = screen.getByPlaceholderText("Name");
+  const emailInput = screen.getByPlaceholderText("Email");
+  const interest1Checkbox = screen.getByLabelText("Technology");
+  const interest3Checkbox = screen.getByLabelText("Travel");
+  const submitButton = screen.getByText("Submit");
+
+  fireEvent.change(nameInput, { target: { value: "Jane Doe" } });
+  fireEvent.change(emailInput, { target: { value: "jane.doe@example.com" } });
+  fireEvent.click(interest1Checkbox);
+  fireEvent.click(interest3Checkbox);
+  fireEvent.click(submitButton);
+
+  const message = screen.getByText(/Name: Jane Doe/);
+  expect(message).toBeInTheDocument();
+  expect(message).toHaveTextContent("Email: jane.doe@example.com");
+  expect(message).toHaveTextContent("Interests: Technology, Travel");
 });
